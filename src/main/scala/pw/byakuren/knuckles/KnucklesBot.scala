@@ -57,6 +57,7 @@ object KnucklesBot extends ListenerAdapter {
       case Some(command) =>
         if (command.restricted && event.getUser.getIdLong != event.getJDA.retrieveApplicationInfo().complete().getOwner.getIdLong) {
           //insufficient permissions
+          event.reply("Knuckles says: no way!").setEphemeral(true).queue()
           return
         }
         command.onSlash(event)
