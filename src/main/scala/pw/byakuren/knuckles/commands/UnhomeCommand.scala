@@ -7,7 +7,7 @@ import pw.byakuren.knuckles.APIAnalytics
 
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
-case object UnhomeCommand extends BotCommand("unhome", "remove home commands from a previous home server", restricted = true) {
+object UnhomeCommand extends BotCommand("unhome", "remove home commands from a previous home server", restricted = true) {
   override def onSlash(event: SlashCommandInteractionEvent)(implicit analytics: APIAnalytics): Unit = {
     val id: String = event.getOption("server_id").getAsString
     Option(event.getJDA.getGuildById(id)) match {

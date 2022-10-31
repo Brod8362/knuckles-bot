@@ -7,7 +7,7 @@ import pw.byakuren.knuckles.APIAnalytics
 import java.io.File
 import java.util.Random
 
-case object MemeCommand extends BotCommand("meme", "Submit your meme for knuckles to rate!") {
+object MemeCommand extends BotCommand("meme", "Submit your meme for knuckles to rate!") {
 
   private val random = new Random()
 
