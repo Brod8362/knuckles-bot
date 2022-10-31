@@ -2,6 +2,7 @@ package pw.byakuren.knuckles.commands
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
+import net.dv8tion.jda.api.utils.FileUpload
 import pw.byakuren.knuckles.APIAnalytics
 
 import java.io.File
@@ -19,9 +20,11 @@ object MemeCommand extends BotCommand("meme", "Submit your meme for knuckles to 
     }
     Option(event.getOption("the_meme")) match {
       case Some(param) =>
-        event.reply(s"Knuckles has rated `${param.getAsString.replaceAll("`", "")}`").addFile(file).queue()
+        event
+          .reply(s"Knuckles has rated `${param.getAsString.replaceAll("`", "")}`")
+          .addFiles(FileUpload.fromData(file)).queue()
       case _ =>
-        event.replyFile(file).queue()
+        event.replyFiles(FileUpload.fromData(file)).queue()
     }
     try {
       analytics.updateUsage(event.getGuild.getIdLong, event.getChannel.getIdLong)

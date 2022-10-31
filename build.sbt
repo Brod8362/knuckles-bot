@@ -6,7 +6,7 @@ scalaVersion := "2.13.2"
 
 resolvers += "jcenter-bintray" at "https://jcenter.bintray.com"
 
-libraryDependencies += "net.dv8tion" % "JDA" % "5.0.0-alpha.5"
+libraryDependencies += "net.dv8tion" % "JDA" % "5.0.0-alpha.22"
 
 cancelable in Global := true
 
