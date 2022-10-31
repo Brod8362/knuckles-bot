@@ -13,17 +13,24 @@ object MemeCommand extends BotCommand("meme", "Submit your meme for knuckles to 
   private val random = new Random()
 
   override def onSlash(event: SlashCommandInteractionEvent)(implicit analytics: APIAnalytics): Unit = {
-    val file = if (random.nextBoolean()) {
-      randomFromArray(approveFiles)
-    } else {
-      randomFromArray(denyFiles)
-    }
+
     Option(event.getOption("the_meme")) match {
       case Some(param) =>
+        val opt = Math.abs(param.getAsString.hashCode() + event.getUser.getId.hashCode)
+        val file = if (opt % 2 == 0) {
+          approveFiles(opt % approveFiles.length)
+        } else {
+          denyFiles(opt % denyFiles.length)
+        }
         event
           .reply(s"Knuckles has rated `${param.getAsString.replaceAll("`", "")}`")
           .addFiles(FileUpload.fromData(file)).queue()
       case _ =>
+        val file = if (random.nextBoolean()) {
+          randomFromArray(approveFiles)
+        } else {
+          randomFromArray(denyFiles)
+        }
         event.replyFiles(FileUpload.fromData(file)).queue()
     }
     try {
