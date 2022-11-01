@@ -76,6 +76,7 @@ object KnucklesBot extends ListenerAdapter {
       .setThumbnail(event.getJDA.getSelfUser.getEffectiveAvatarUrl)
       .addField("Support Server", "https://discord.gg/3Scnd3GvCn", false)
       .addField("User Survey", "https://forms.gle/gvJGHf6NGyALuQVs9", false)
+      .addField("Source Code", "https://github.com/Brod8362/knuckles-bot", false)
       .build()
     event.getGuild.getDefaultChannel.asTextChannel().sendMessageEmbeds(embed).queue()
   }
