@@ -1,6 +1,6 @@
 package pw.byakuren.knuckles
 
-import net.dv8tion.jda.api.JDABuilder
+import net.dv8tion.jda.api.{EmbedBuilder, JDABuilder}
 import net.dv8tion.jda.api.entities.{Activity, Guild}
 import net.dv8tion.jda.api.events.ExceptionEvent
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateNameEvent
@@ -9,6 +9,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import pw.byakuren.knuckles.commands.{InviteCommand, MemeCommand, StopCommand, UnhomeCommand}
+
+import java.awt.Color
 
 object KnucklesBot extends ListenerAdapter {
 
@@ -66,6 +68,16 @@ object KnucklesBot extends ListenerAdapter {
 
   override def onGuildJoin(event: GuildJoinEvent): Unit = {
     guildUpdate(joined = true, event.getGuild)
+    val embed = new EmbedBuilder()
+      .setTitle("Thanks for adding Knuckles!")
+      .setColor(Color.RED)
+      .setDescription("Thanks for adding Knuckles! If you need help, you can join the support server.\n" +
+        "It would also be greatly appreciated if you could fill out the knuckles user survey!\nThanks again!")
+      .setThumbnail(event.getJDA.getSelfUser.getEffectiveAvatarUrl)
+      .addField("Support Server", "https://discord.gg/3Scnd3GvCn", false)
+      .addField("User Survey", "https://forms.gle/gvJGHf6NGyALuQVs9", false)
+      .build()
+    event.getGuild.getDefaultChannel.asTextChannel().sendMessageEmbeds(embed).queue()
   }
 
   override def onGuildLeave(event: GuildLeaveEvent): Unit = {
