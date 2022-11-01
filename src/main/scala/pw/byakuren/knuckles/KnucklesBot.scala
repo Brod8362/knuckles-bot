@@ -2,20 +2,19 @@ package pw.byakuren.knuckles
 
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.{Activity, Guild}
+import net.dv8tion.jda.api.events.ExceptionEvent
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateNameEvent
 import net.dv8tion.jda.api.events.guild.{GuildJoinEvent, GuildLeaveEvent}
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
-import net.dv8tion.jda.api.events.ExceptionEvent
 import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import pw.byakuren.knuckles.commands.{InviteCommand, MemeCommand, StopCommand, UnhomeCommand}
 
-import java.io.File
-import java.util.Scanner
-
 object KnucklesBot extends ListenerAdapter {
 
-  implicit val analytics: APIAnalytics = new APIAnalytics("knuckles")
+  val botConfig: Map[String, String] = ConfigParser.parse("config")
+
+  implicit val analytics: APIAnalytics = new APIAnalytics("knuckles", botConfig.getOrElse("analytics", "http://localhost:9646"))
 
   val commandsSeq = Seq(
     InviteCommand,
@@ -25,8 +24,7 @@ object KnucklesBot extends ListenerAdapter {
   )
 
   def main(args: Array[String]): Unit = {
-    val token = new Scanner(new File("token")).nextLine()
-    JDABuilder.createLight(token).addEventListeners(this).build()
+    JDABuilder.createLight(botConfig("token")).addEventListeners(this).build()
   }
 
   override def onReady(event: ReadyEvent): Unit = {
@@ -39,19 +37,15 @@ object KnucklesBot extends ListenerAdapter {
         .map(_.commandData): _*
     ).queue()
 
-    val homeIdOpt: Option[String] = new File("home") match {
-      case f if f.exists() =>
-        Some(new Scanner(f).nextLine())
-      case _ =>
-        None
-    }
+
+    val homeIdOpt = botConfig.get("home")
     homeIdOpt match {
       case Some(homeId) if Option(event.getJDA.getGuildById(homeId)).isDefined =>
         val guild = event.getJDA.getGuildById(homeId)
-        println(s"home server set to ${guild.getName}")
+        analytics.log(s"home server set to ${guild.getName}")
         guild.updateCommands().addCommands(commandsSeq.map(_.commandData):_*).queue()
       case _ =>
-        println("No home available")
+        analytics.log("No home available")
     }
   }
 
@@ -92,7 +86,7 @@ object KnucklesBot extends ListenerAdapter {
       case e: Exception =>
         dm.sendMessage(s"couldn't update guild stats: $e").queue()
     }
-    println(txt)
+    analytics.log(txt)
   }
 
   override def onGuildUpdateName(event: GuildUpdateNameEvent): Unit = {
