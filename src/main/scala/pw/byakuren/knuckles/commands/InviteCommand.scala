@@ -1,4 +1,5 @@
 package pw.byakuren.knuckles.commands
+
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import pw.byakuren.knuckles.APIAnalytics
@@ -13,6 +14,5 @@ object InviteCommand extends BotCommand("invite", "Get an invite link for knuckl
   override def onSlash(event: SlashCommandInteractionEvent)(implicit analytics: APIAnalytics): Unit = {
     event.reply(generateInvite(event.getJDA)).queue()
   }
-
 
 }

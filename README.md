@@ -8,9 +8,13 @@ Have knuckles rate your meme!
 
 # Running
 
-The bot expects two files to exist: 
-- `home` (which is optional, and it is the ID of the "home" server)
-- `token` (the token for the bot. this is **required**)
+The bot reads from the following configuration file:
+
+```
+token=yourtokenhere
+home=1234566789
+analytics=http://localhost:9646
+```
 
 You can run the bot via `sbt`.
 
@@ -38,4 +42,4 @@ Knuckles collects very rudimentary analytics. Notably, the number of severs, and
 
 This API is an instance of my [bot analytics API](https://github.com/Brod8362/bot-analytics).
 
-It is expected to be available at http://localhost:9646. Currently this is not configurable.
+It is expected to be available at http://localhost:9646. Currently, this is not configurable.
