@@ -6,7 +6,11 @@ scalaVersion := "2.13.2"
 
 resolvers += "jcenter-bintray" at "https://jcenter.bintray.com"
 
-libraryDependencies += "net.dv8tion" % "JDA" % "5.0.0-alpha.22"
+libraryDependencies ++= Seq(
+  "net.dv8tion" % "JDA" % "5.0.0-alpha.22",
+  "com.lihaoyi" %% "requests" % "0.7.1",
+  "com.lihaoyi" %% "upickle" % "2.0.0"
+)
 
 cancelable in Global := true
 

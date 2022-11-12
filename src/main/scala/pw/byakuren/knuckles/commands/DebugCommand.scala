@@ -2,7 +2,8 @@ package pw.byakuren.knuckles.commands
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
-import pw.byakuren.knuckles.{APIAnalytics, KnucklesBot}
+import pw.byakuren.knuckles.KnucklesBot
+import pw.byakuren.knuckles.external.APIAnalytics
 
 class DebugCommand(config: Map[String, String]) extends BotCommand("debug", "for debugging purposes", true) {
   override def onSlash(event: SlashCommandInteractionEvent)(implicit analytics: APIAnalytics): Unit = {
@@ -13,8 +14,8 @@ class DebugCommand(config: Map[String, String]) extends BotCommand("debug", "for
           case Some(userId) =>
             Option(event.getGuild.retrieveMemberById(userId.getAsString).complete()) match {
               case Some(member) =>
-                val assoc = KnucklesBot.userHasAssociation(member, config("home"))
-                event.reply(s"$assoc").queue()
+//                val assoc = KnucklesBot.userHasAssociation(member, config("home"))
+//                event.reply(s"$assoc").queue()
               case _ => //user not found
                 event.reply("User not found.").queue()
             }

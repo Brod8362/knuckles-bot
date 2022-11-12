@@ -1,4 +1,5 @@
-package pw.byakuren.knuckles
+package pw.byakuren.knuckles.external
+
 import java.net.{HttpURLConnection, URL, URLEncoder}
 
 class APIAnalytics(name: String, base: String = "http://127.0.0.1:9646") {
@@ -38,6 +39,7 @@ class APIAnalytics(name: String, base: String = "http://127.0.0.1:9646") {
   }
 
   private def logGeneric(msg: String, level: String): Unit = {
+    println(f"[$level] $msg")
     post(s"$base/v1/log/$name", params = Map("message" -> msg, "level" -> level))
   }
 

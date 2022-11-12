@@ -2,7 +2,7 @@ package pw.byakuren.knuckles.commands
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.build.{Commands, SlashCommandData}
-import pw.byakuren.knuckles.APIAnalytics
+import pw.byakuren.knuckles.external.APIAnalytics
 
 abstract case class BotCommand(name: String, description: String = "", restricted: Boolean = false) {
 

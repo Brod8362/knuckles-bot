@@ -3,7 +3,7 @@ package pw.byakuren.knuckles.commands
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
-import pw.byakuren.knuckles.APIAnalytics
+import pw.byakuren.knuckles.external.APIAnalytics
 
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 

@@ -2,7 +2,7 @@ package pw.byakuren.knuckles.commands
 
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
-import pw.byakuren.knuckles.APIAnalytics
+import pw.byakuren.knuckles.external.APIAnalytics
 
 object InviteCommand extends BotCommand("invite", "Get an invite link for knuckles!") {
 

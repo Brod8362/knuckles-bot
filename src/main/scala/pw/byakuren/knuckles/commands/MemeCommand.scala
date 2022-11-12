@@ -3,7 +3,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
 import net.dv8tion.jda.api.utils.FileUpload
-import pw.byakuren.knuckles.APIAnalytics
+import pw.byakuren.knuckles.external.APIAnalytics
 
 import java.io.File
 import java.util.Random

@@ -1,7 +1,7 @@
 package pw.byakuren.knuckles.commands
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
-import pw.byakuren.knuckles.APIAnalytics
+import pw.byakuren.knuckles.external.APIAnalytics
 
 object StopCommand extends BotCommand("stop", "stop bot", restricted = true) {
 

@@ -1,22 +1,26 @@
 package pw.byakuren.knuckles
 
-import net.dv8tion.jda.api.{EmbedBuilder, JDABuilder}
 import net.dv8tion.jda.api.entities.{Activity, Guild}
 import net.dv8tion.jda.api.events.ExceptionEvent
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateNameEvent
 import net.dv8tion.jda.api.events.guild.{GuildJoinEvent, GuildLeaveEvent}
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
-import net.dv8tion.jda.api.events.session.ReadyEvent
+import net.dv8tion.jda.api.events.session.{ReadyEvent, ShutdownEvent}
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import net.dv8tion.jda.api.{EmbedBuilder, JDABuilder}
 import pw.byakuren.knuckles.commands.{InviteCommand, MemeCommand, StopCommand, UnhomeCommand}
+import pw.byakuren.knuckles.external.{APIAnalytics, ShardAPIException, ShardAPIWrapper}
 
 import java.awt.Color
+import java.util.concurrent.{Executors, TimeUnit}
 
 object KnucklesBot extends ListenerAdapter {
 
   val botConfig: Map[String, String] = ConfigParser.parse("config")
 
   implicit val analytics: APIAnalytics = new APIAnalytics("knuckles", botConfig.getOrElse("analytics", "http://localhost:9646"))
+  val scheduler = Executors.newSingleThreadScheduledExecutor()
+  val shardAPI: ShardAPIWrapper = new ShardAPIWrapper("placeholder")
 
   val commandsSeq = Seq(
     InviteCommand,
@@ -26,11 +30,35 @@ object KnucklesBot extends ListenerAdapter {
   )
 
   def main(args: Array[String]): Unit = {
-    JDABuilder.createLight(botConfig("token")).addEventListeners(this).build()
+    try {
+      val (shardId, maxShards) = shardAPI.join()
+      analytics.log(s"Using shard $shardId / $maxShards")
+      scheduler.scheduleAtFixedRate(() => shardAPI.ping(), 15, 15, TimeUnit.SECONDS)
+      JDABuilder
+        .createLight(botConfig("token"))
+        .addEventListeners(this)
+        .useSharding(shardId, maxShards)
+        .build()
+    } catch {
+      case e: ShardAPIException =>
+        analytics.error(s"Failed to be assigned a shard ID (${e.getClass.getName})")
+    }
+
+  }
+
+  override def onShutdown(event: ShutdownEvent): Unit = {
+    analytics.log("Shutting down")
+    scheduler.shutdown()
+    try {
+      shardAPI.leave()
+    } catch {
+      case e: ShardAPIException =>
+        analytics.error("Failed to leave shard network")
+    }
   }
 
   override def onReady(event: ReadyEvent): Unit = {
-    event.getJDA.getPresence.setActivity(Activity.playing("/meme to submit meme, /invite"))
+    event.getJDA.getPresence.setActivity(Activity.playing(s"now v2! (Shard ${event.getJDA.getShardInfo.getShardId})"))
     commandsSeq.filter(!_.restricted).foreach(cmd => event.getJDA.upsertCommand(cmd.commandData).queue())
 
     event.getJDA.updateCommands().addCommands(
