@@ -10,7 +10,7 @@ class UUIDMismatchException extends ShardAPIException
 class SlotAlreadyEmptyException extends ShardAPIException
 class IncorrectStateException extends ShardAPIException
 
-class ShardAPIWrapper(version: String, address: String = "http://127.0.0.1:57537", uuid: UUID = UUID.randomUUID()) {
+class ShardAPIWrapper(val version: String, address: String = "http://127.0.0.1:57537", val uuid: UUID = UUID.randomUUID()) {
   var shardIdOpt: Option[Int] = None
   var maxShardsOpt: Option[Int] = None
 

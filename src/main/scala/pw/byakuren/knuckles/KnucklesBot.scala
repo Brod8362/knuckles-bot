@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.events.guild.{GuildJoinEvent, GuildLeaveEvent}
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.session.{ReadyEvent, ShutdownEvent}
 import net.dv8tion.jda.api.hooks.ListenerAdapter
-import net.dv8tion.jda.api.{EmbedBuilder, JDABuilder}
+import net.dv8tion.jda.api.{EmbedBuilder, JDA, JDABuilder}
 import pw.byakuren.knuckles.commands.{InviteCommand, MemeCommand, StopCommand, UnhomeCommand}
 import pw.byakuren.knuckles.external.{APIAnalytics, ShardAPIException, ShardAPIWrapper}
 
@@ -33,7 +33,6 @@ object KnucklesBot extends ListenerAdapter {
     try {
       val (shardId, maxShards) = shardAPI.join()
       analytics.log(s"Using shard $shardId / $maxShards")
-      scheduler.scheduleAtFixedRate(() => shardAPI.ping(), 15, 15, TimeUnit.SECONDS)
       JDABuilder
         .createLight(botConfig("token"))
         .addEventListeners(this)
@@ -44,6 +43,16 @@ object KnucklesBot extends ListenerAdapter {
         analytics.error(s"Failed to be assigned a shard ID (${e.getClass.getName})")
     }
 
+  }
+
+  def heartbeat(jda: JDA): Unit = {
+    try{
+      shardAPI.ping()
+    } catch {
+      case e: ShardAPIException =>
+        //trigger a shutdown because something fatal has occurred
+        jda.shutdown()
+    }
   }
 
   override def onShutdown(event: ShutdownEvent): Unit = {
@@ -58,8 +67,9 @@ object KnucklesBot extends ListenerAdapter {
   }
 
   override def onReady(event: ReadyEvent): Unit = {
-    event.getJDA.getPresence.setActivity(Activity.playing(s"now v2! (Shard ${event.getJDA.getShardInfo.getShardId})"))
+    event.getJDA.getPresence.setActivity(Activity.playing(s"now v2! (shard ${event.getJDA.getShardInfo.getShardId})"))
     commandsSeq.filter(!_.restricted).foreach(cmd => event.getJDA.upsertCommand(cmd.commandData).queue())
+    scheduler.scheduleAtFixedRate(() => heartbeat(event.getJDA), 15, 15, TimeUnit.SECONDS)
 
     event.getJDA.updateCommands().addCommands(
       commandsSeq

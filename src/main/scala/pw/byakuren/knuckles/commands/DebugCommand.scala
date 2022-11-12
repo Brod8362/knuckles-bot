@@ -3,12 +3,14 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
 import pw.byakuren.knuckles.KnucklesBot
-import pw.byakuren.knuckles.external.APIAnalytics
+import pw.byakuren.knuckles.external.{APIAnalytics, ShardAPIWrapper}
 
-class DebugCommand(config: Map[String, String]) extends BotCommand("debug", "for debugging purposes", true) {
+class DebugCommand(config: Map[String, String], shardAPIWrapper: ShardAPIWrapper) extends BotCommand("debug", "for debugging purposes", true) {
   override def onSlash(event: SlashCommandInteractionEvent)(implicit analytics: APIAnalytics): Unit = {
     val feature = event.getOption("feature").getAsString
     feature match {
+      case "info" =>
+        event.reply(s"shard: ${shardAPIWrapper.shardIdOpt.get} / ${shardAPIWrapper.maxShardsOpt.get}\nuuid: ${shardAPIWrapper.uuid}").queue()
       case "association" =>
         Option(event.getOption("arg1")) match {
           case Some(userId) =>
