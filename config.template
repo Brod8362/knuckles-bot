@@ -2,3 +2,4 @@ home=12345
 home_role=67890
 token=MTAzNjc2MzXXX...
 analytics=http://localhost:9646
+shard_api=http://localhost:57537

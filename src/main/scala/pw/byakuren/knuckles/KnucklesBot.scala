@@ -9,18 +9,20 @@ import net.dv8tion.jda.api.events.session.{ReadyEvent, ShutdownEvent}
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.{EmbedBuilder, JDA, JDABuilder}
 import pw.byakuren.knuckles.commands.{InviteCommand, MemeCommand, StopCommand, UnhomeCommand}
-import pw.byakuren.knuckles.external.{APIAnalytics, ShardAPIException, ShardAPIWrapper}
+import pw.byakuren.knuckles.external.{APIAnalytics, ShardAPIWrapper}
 
 import java.awt.Color
-import java.util.concurrent.{Executors, TimeUnit}
+import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
+import scala.util.control.Breaks.break
 
 object KnucklesBot extends ListenerAdapter {
 
   val botConfig: Map[String, String] = ConfigParser.parse("config")
 
   implicit val analytics: APIAnalytics = new APIAnalytics("knuckles", botConfig.getOrElse("analytics", "http://localhost:9646"))
-  val scheduler = Executors.newSingleThreadScheduledExecutor()
-  val shardAPI: ShardAPIWrapper = new ShardAPIWrapper("placeholder")
+  val scheduler: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
+  val shardAPI: ShardAPIWrapper = new ShardAPIWrapper("placeholder", address = botConfig.getOrElse("shard_api", "http://localhost:9646"))
+  var doHeartbeat: Boolean = false
 
   val commandsSeq = Seq(
     InviteCommand,
@@ -30,45 +32,71 @@ object KnucklesBot extends ListenerAdapter {
   )
 
   def main(args: Array[String]): Unit = {
-    try {
-      val (shardId, maxShards) = shardAPI.join()
-      analytics.log(s"Using shard $shardId / $maxShards")
-      JDABuilder
-        .createLight(botConfig("token"))
-        .addEventListeners(this)
-        .useSharding(shardId, maxShards)
-        .build()
-    } catch {
-      case e: ShardAPIException =>
-        analytics.error(s"Failed to be assigned a shard ID (${e.getClass.getName})")
+    var retriesRemaining = 3
+    while (true) {
+      try {
+        val (shardId, maxShards) = shardAPI.join()
+        analytics.log(s"Using shard $shardId / $maxShards")
+        JDABuilder
+          .createLight(botConfig("token"))
+          .addEventListeners(this)
+          .useSharding(shardId, maxShards)
+          .build()
+        retriesRemaining = 3
+        synchronized {
+          wait()
+        }
+        shardAPI.reset()
+      } catch {
+        case e: Exception =>
+          analytics.error(s"Failed to be assigned a shard ID (${e.getClass.getName})")
+          if (retriesRemaining == 0) {
+            analytics.error("Maximum retries exceeded, giving up")
+            break
+          }
+          retriesRemaining-=1
+      }
+      analytics.log("Trying again in 30 seconds")
+      Thread.sleep(30_000) // wait 30 seconds and try again
     }
-
   }
 
   def heartbeat(jda: JDA): Unit = {
-    try{
-      shardAPI.ping()
-    } catch {
-      case e: ShardAPIException =>
-        //trigger a shutdown because something fatal has occurred
-        jda.shutdown()
+    if (doHeartbeat) {
+      try{
+        shardAPI.ping()
+      } catch {
+        case e: Exception =>
+          //trigger a shutdown because something fatal has occurred
+          analytics.error(s"Failed to heartbeat, shutting down and retrying (${e.getClass.getName})")
+          jda.shutdown()
+          synchronized {
+            notifyAll()
+          }
+      }
     }
   }
 
   override def onShutdown(event: ShutdownEvent): Unit = {
-    analytics.log("Shutting down")
-    scheduler.shutdown()
+    doHeartbeat = false
+    analytics.log("Shutdown issued")
     try {
       shardAPI.leave()
+      // If leaving the shard API was successful, then odds are this is an invoked shutdown (via the shutdown command)
+      // The only other place that the shutdown can be called is from the heartbeat, if the heartbeat fails then the
+      // the odds of a leave attempt failing are also high.
+      // Is this a perfect method? No, not at all. Will it get the job done? Probably!
+      System.exit(0)
     } catch {
-      case e: ShardAPIException =>
-        analytics.error("Failed to leave shard network")
+      case e: Exception =>
+        analytics.error(s"Failed to leave shard network (${e.getClass.getName})")
     }
   }
 
   override def onReady(event: ReadyEvent): Unit = {
     event.getJDA.getPresence.setActivity(Activity.playing(s"now v2! (shard ${event.getJDA.getShardInfo.getShardId})"))
     commandsSeq.filter(!_.restricted).foreach(cmd => event.getJDA.upsertCommand(cmd.commandData).queue())
+    doHeartbeat = true
     scheduler.scheduleAtFixedRate(() => heartbeat(event.getJDA), 15, 15, TimeUnit.SECONDS)
 
     event.getJDA.updateCommands().addCommands(

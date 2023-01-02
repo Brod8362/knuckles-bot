@@ -2,7 +2,7 @@ package pw.byakuren.knuckles.external
 
 import java.net.{HttpURLConnection, URL, URLEncoder}
 
-class APIAnalytics(name: String, base: String = "http://127.0.0.1:9646") {
+class APIAnalytics(name: String, base: String = "http://127.0.0.1:9646", fake: Boolean = false) {
   private def buildParams(params: Map[String, String]): String = {
     params.map({
       case (k, v) => URLEncoder.encode(k, "UTF-8") + "=" + URLEncoder.encode(v, "UTF-8")
@@ -11,6 +11,9 @@ class APIAnalytics(name: String, base: String = "http://127.0.0.1:9646") {
   }
 
   private def post(uri: String, params: Map[String, String] = Map()): Int = {
+    if (this.fake) {
+      return 200
+    }
     val url = new URL(uri)
     val conn = url.openConnection().asInstanceOf[HttpURLConnection]
     conn.setRequestMethod("POST")

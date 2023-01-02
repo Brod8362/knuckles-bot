@@ -67,6 +67,11 @@ class ShardAPIWrapper(val version: String, address: String = "http://127.0.0.1:5
 
   }
 
+  def reset(): Unit = {
+    shardIdOpt = None
+    maxShardsOpt = None
+  }
+
   def ping(): Unit = {
     shardIdOpt match {
       case Some(shardId) =>
