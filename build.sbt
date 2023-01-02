@@ -1,6 +1,6 @@
 name := "knuckles"
 
-version := "0.4"
+version := "0.5"
 
 scalaVersion := "2.13.2"
 
@@ -16,6 +16,7 @@ cancelable in Global := true
 
 assemblyMergeStrategy in assembly := {
   case "module-info.class" => MergeStrategy.first
+  case "META-INF/versions/9/module-info.class" => MergeStrategy.first
   case x =>
     val oldStrategy = (assemblyMergeStrategy in assembly).value
     oldStrategy(x)
