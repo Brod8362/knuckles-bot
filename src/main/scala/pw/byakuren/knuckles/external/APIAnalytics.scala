@@ -23,7 +23,7 @@ class APIAnalytics(botName: String,
         .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
         .tag("bot", botName)
         .tag("shard_id", shardId.toString)
-        .addField("value", count.toString)
+        .addField("value", count)
         .build()
     )
   }
@@ -34,7 +34,7 @@ class APIAnalytics(botName: String,
         .tag("bot", botName)
         .tag("channel", channelId.toString)
         .tag("guild", guildId.toString)
-        .addField("value", "1")
+        .addField("value", 1)
         .build()
     )
   }
