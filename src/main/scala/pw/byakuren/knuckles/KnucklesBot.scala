@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.events.session.{ReadyEvent, ShutdownEvent}
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.{EmbedBuilder, JDA, JDABuilder}
 import pw.byakuren.knuckles.commands.{InviteCommand, MemeCommand, StopCommand, UnhomeCommand}
-import pw.byakuren.knuckles.external.{APIAnalytics, ShardAPIWrapper}
+import pw.byakuren.knuckles.external.{APIAnalytics, PhonyShardAPIWrapper, ShardAPIWrapper}
 
 import java.awt.Color
 import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
@@ -21,7 +21,13 @@ object KnucklesBot extends ListenerAdapter {
 
   implicit val analytics: APIAnalytics = new APIAnalytics("knuckles", botConfig.getOrElse("analytics", "http://localhost:8086"))
   val scheduler: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
-  val shardAPI: ShardAPIWrapper = new ShardAPIWrapper("placeholder", address = botConfig.getOrElse("shard_api", "http://localhost:9646"))
+  val shardAPI: ShardAPIWrapper = botConfig.get("solo") match {
+    case Some(_) => PhonyShardAPIWrapper
+    case _ => botConfig.get("shard_api") match {
+      case Some(shardApiAddress) =>  new ShardAPIWrapper("placeholder", address = shardApiAddress)
+      case _ => new ShardAPIWrapper("placeholder")
+    }
+  }
   var doHeartbeat: Boolean = false
 
   val commandsSeq = Seq(

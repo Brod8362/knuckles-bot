@@ -63,6 +63,7 @@ class ShardAPIWrapper(val version: String, address: String = "http://127.0.0.1:5
           case _ =>
             throw new RuntimeException(f"unexpected API response ${response.statusCode}")
         }
+      case _ =>
     }
 
   }
