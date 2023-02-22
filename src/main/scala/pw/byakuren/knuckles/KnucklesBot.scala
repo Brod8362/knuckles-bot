@@ -19,7 +19,7 @@ object KnucklesBot extends ListenerAdapter {
 
   val botConfig: Map[String, String] = ConfigParser.parse("config")
 
-  implicit val analytics: APIAnalytics = new APIAnalytics("knuckles", botConfig.getOrElse("analytics", "http://localhost:9646"))
+  implicit val analytics: APIAnalytics = new APIAnalytics("knuckles", botConfig.getOrElse("analytics", "http://localhost:8086"))
   val scheduler: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
   val shardAPI: ShardAPIWrapper = new ShardAPIWrapper("placeholder", address = botConfig.getOrElse("shard_api", "http://localhost:9646"))
   var doHeartbeat: Boolean = false
@@ -158,7 +158,7 @@ object KnucklesBot extends ListenerAdapter {
     val dm = owner.openPrivateChannel().complete()
     dm.sendMessage(txt).queue()
     try {
-      analytics.updateGuilds(guild.getJDA.getGuilds.size())
+      analytics.updateGuilds(guild.getJDA.getGuilds.size(), guild.getJDA.getShardInfo.getShardId)
       analytics.updateGuildName(guild.getIdLong, guild.getName)
       analytics.log(txt)
     } catch {

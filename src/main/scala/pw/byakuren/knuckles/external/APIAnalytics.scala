@@ -1,49 +1,64 @@
 package pw.byakuren.knuckles.external
 
-import java.net.{HttpURLConnection, URL, URLEncoder}
+import org.influxdb.dto.Point
+import org.influxdb.{InfluxDB, InfluxDBFactory}
 
-class APIAnalytics(name: String, base: String = "http://127.0.0.1:9646", fake: Boolean = false) {
-  private def buildParams(params: Map[String, String]): String = {
-    params.map({
-      case (k, v) => URLEncoder.encode(k, "UTF-8") + "=" + URLEncoder.encode(v, "UTF-8")
-    }
-    ).mkString("&")
+import java.util.concurrent.TimeUnit
+
+class APIAnalytics(botName: String,
+                   influxUri: String = "http://127.0.0.1:8086",
+                   database: String = "discord",
+                   credentials: Option[(String, String)] = None
+                  ) {
+
+  val influx: InfluxDB = credentials match {
+    case Some((username, password)) => InfluxDBFactory.connect(influxUri, username, password)
+    case _ => InfluxDBFactory.connect(influxUri)
+  }
+  influx.setDatabase(database)
+
+  def updateGuilds(count: Int, shardId: Int): Unit = {
+    influx.write(
+      Point.measurement("guild_count")
+        .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+        .tag("bot", botName)
+        .tag("shard_id", shardId.toString)
+        .addField("value", count.toString)
+        .build()
+    )
   }
 
-  private def post(uri: String, params: Map[String, String] = Map()): Int = {
-    if (this.fake) {
-      return 200
-    }
-    val url = new URL(uri)
-    val conn = url.openConnection().asInstanceOf[HttpURLConnection]
-    conn.setRequestMethod("POST")
-    conn.setConnectTimeout(5000)
-    conn.setReadTimeout(5000)
-    if (params.nonEmpty) {
-      val data = buildParams(params).getBytes("UTF-8")
-      conn.setRequestProperty("Content-Length", data.length.toString)
-      conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
-      conn.setDoOutput(true)
-      conn.getOutputStream.write(data)
-    }
-    conn.getResponseCode
+  def updateUsage(guildId: Long, channelId: Long): Unit = {
+    influx.write(
+      Point.measurement("use")
+        .tag("bot", botName)
+        .tag("channel", channelId.toString)
+        .tag("guild", guildId.toString)
+        .addField("value", "1")
+        .build()
+    )
   }
 
-  def updateGuilds(count: Int): Unit = {
-    post(s"$base/v1/guild/$name/$count")
-  }
-
-  def updateUsage(guild: Long, channel: Long): Unit = {
-    post(s"$base/v1/data/$name/$guild/$channel")
-  }
-
-  def updateGuildName(guild: Long, name: String): Unit = {
-    post(s"$base/v1/guild_name/$guild", params = Map("name" -> name))
+  def updateGuildName(guildId: Long, name: String): Unit = {
+    influx.write(
+      Point.measurement("guild_names")
+        .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+        .tag("guild", guildId.toString)
+        .addField("value", name)
+        .build()
+    )
   }
 
   private def logGeneric(msg: String, level: String): Unit = {
     println(f"[$level] $msg")
-    post(s"$base/v1/log/$name", params = Map("message" -> msg, "level" -> level))
+    influx.write(
+      Point.measurement("log")
+        .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+        .tag("bot", botName)
+        .tag("level", level)
+        .addField("value", msg)
+        .build()
+    )
   }
 
   def log(msg: String): Unit = {
