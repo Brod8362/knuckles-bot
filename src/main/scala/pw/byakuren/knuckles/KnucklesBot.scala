@@ -17,6 +17,8 @@ import scala.util.control.Breaks.break
 
 object KnucklesBot extends ListenerAdapter {
 
+  val BOT_VERSION = "v0.6"
+
   val botConfig: Map[String, String] = ConfigParser.parse("config")
 
   implicit val analytics: APIAnalytics = new APIAnalytics("knuckles", botConfig.getOrElse("analytics", "http://localhost:8086"))
@@ -24,8 +26,8 @@ object KnucklesBot extends ListenerAdapter {
   val shardAPI: ShardAPIWrapper = botConfig.get("solo") match {
     case Some(_) => PhonyShardAPIWrapper
     case _ => botConfig.get("shard_api") match {
-      case Some(shardApiAddress) =>  new ShardAPIWrapper("placeholder", address = shardApiAddress)
-      case _ => new ShardAPIWrapper("placeholder")
+      case Some(shardApiAddress) =>  new ShardAPIWrapper(BOT_VERSION, address = shardApiAddress)
+      case _ => new ShardAPIWrapper(BOT_VERSION)
     }
   }
   var doHeartbeat: Boolean = false
