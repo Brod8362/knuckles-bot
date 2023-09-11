@@ -161,7 +161,7 @@ object KnucklesBot extends ListenerAdapter {
 
   def guildUpdate(joined: Boolean, guild: Guild): Unit = {
     val owner = guild.getJDA.retrieveApplicationInfo().complete().getOwner
-    val txt = s"${if (joined) "joined" else "left"} guild `${guild.getName}`:${guild.getId} (owned by <@${guild.getOwnerId}>) " +
+    val txt = s"[s${guild.getJDA.getShardInfo.getShardId}] ${if (joined) "joined" else "left"} guild `${guild.getName}`:${guild.getId} (owned by <@${guild.getOwnerId}>) " +
       s"(${guild.getMemberCount} members) [${guild.getJDA.getGuilds.size()} servers]"
     val dm = owner.openPrivateChannel().complete()
     dm.sendMessage(txt).queue()
