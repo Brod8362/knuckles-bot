@@ -103,7 +103,6 @@ object KnucklesBot extends ListenerAdapter {
 
   override def onReady(event: ReadyEvent): Unit = {
     event.getJDA.getPresence.setActivity(Activity.playing(s"now v2! (shard ${event.getJDA.getShardInfo.getShardId})"))
-    commandsSeq.filter(!_.restricted).foreach(cmd => event.getJDA.upsertCommand(cmd.commandData).queue())
     doHeartbeat = true
     scheduler.scheduleAtFixedRate(() => heartbeat(event.getJDA), 15, 15, TimeUnit.SECONDS)
 
