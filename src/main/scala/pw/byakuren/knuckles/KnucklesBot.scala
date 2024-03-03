@@ -17,7 +17,7 @@ import scala.util.control.Breaks.break
 
 object KnucklesBot extends ListenerAdapter {
 
-  val BOT_VERSION = "v0.7"
+  val BOT_VERSION = "v0.8"
   val DEFAULT_CONFIG_PATH = "./config"
 
   val configPath: String = Option(System.getenv("KNUCKLES_CONFIG_PATH")).getOrElse(DEFAULT_CONFIG_PATH)
@@ -31,16 +31,6 @@ object KnucklesBot extends ListenerAdapter {
     case _ => new APIAnalytics("knuckles", botConfig.getOrElse("analytics", "http://localhost:8086"))
   }
 
-  val scheduler: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
-  val shardAPI: ShardAPIWrapper = botConfig.get("solo") match {
-    case Some(_) => PhonyShardAPIWrapper
-    case _ => botConfig.get("shard_api") match {
-      case Some(shardApiAddress) =>  new ShardAPIWrapper(BOT_VERSION, address = shardApiAddress)
-      case _ => new ShardAPIWrapper(BOT_VERSION)
-    }
-  }
-  var doHeartbeat: Boolean = false
-
   val commandsSeq = Seq(
     InviteCommand,
     MemeCommand,
@@ -49,71 +39,47 @@ object KnucklesBot extends ListenerAdapter {
   )
 
   def main(args: Array[String]): Unit = {
-    var retriesRemaining = 3
-    while (true) {
-      try {
-        val (shardId, maxShards) = shardAPI.join()
-        analytics.log(s"Using shard $shardId / $maxShards")
-        JDABuilder
-          .createLight(botConfig("token"))
-          .addEventListeners(this)
-          .useSharding(shardId, maxShards)
-          .build()
-        retriesRemaining = 3
-        synchronized {
-          wait()
-        }
-        shardAPI.reset()
-      } catch {
-        case e: Exception =>
-          analytics.error(s"Failed to be assigned a shard ID (${e.getClass.getName})")
-          if (retriesRemaining == 0) {
-            analytics.error("Maximum retries exceeded, giving up")
-            break
-          }
-          retriesRemaining-=1
-      }
-      analytics.log("Trying again in 30 seconds")
-      Thread.sleep(30_000) // wait 30 seconds and try again
+    val kubePodName = Option(System.getenv("KNUCKLES_POD_NAME")) match {
+      case Some(t) => t
+      case _ =>
+        println("environment variable KNUCKLES_POD_NAME not specified, exiting")
+        return
     }
-  }
+    println(kubePodName)
 
-  def heartbeat(jda: JDA): Unit = {
-    if (doHeartbeat) {
-      try{
-        shardAPI.ping()
-      } catch {
-        case e: Exception =>
-          //trigger a shutdown because something fatal has occurred
-          analytics.error(s"Failed to heartbeat, shutting down and retrying (${e.getClass.getName})")
-          jda.shutdown()
-          synchronized {
-            notifyAll()
-          }
-      }
+    val maxShards = Option(System.getenv("KNUCKLES_MAX_SHARDS")) match {
+      case Some(t) if t.toIntOption.isDefined => t.toIntOption.get
+      case Some(t) =>
+        println(s"failed to decode KNUCKLES_MAX_SHARDS=$t into int")
+        return
+      case _ =>
+        println("KNUCKLES_MAX_SHARDS not specified, exiting")
+        return
     }
+
+    val shardId = kubePodName.split("-").lastOption match {
+      case Some(v) if v.toIntOption.isDefined => v.toIntOption.get
+      case Some(v) =>
+        println(s"failed to determine shard id from $v")
+        return
+      case _ =>
+        println("shard id doesn't seem to to be of the correct format (expected something like knuckles-shard-0)")
+        return
+    }
+    //this must not be nul
+    println(s"logging in as $shardId/$maxShards")
+    JDABuilder.createLight(botConfig("token"))
+      .addEventListeners(this)
+      .useSharding(shardId, maxShards)
+      .build()
   }
 
   override def onShutdown(event: ShutdownEvent): Unit = {
-    doHeartbeat = false
     analytics.log("Shutdown issued")
-    try {
-      shardAPI.leave()
-      // If leaving the shard API was successful, then odds are this is an invoked shutdown (via the shutdown command)
-      // The only other place that the shutdown can be called is from the heartbeat, if the heartbeat fails then the
-      // the odds of a leave attempt failing are also high.
-      // Is this a perfect method? No, not at all. Will it get the job done? Probably!
-      System.exit(0)
-    } catch {
-      case e: Exception =>
-        analytics.error(s"Failed to leave shard network (${e.getClass.getName})")
-    }
   }
 
   override def onReady(event: ReadyEvent): Unit = {
     event.getJDA.getPresence.setActivity(Activity.playing(s"now v2! (shard ${event.getJDA.getShardInfo.getShardId})"))
-    doHeartbeat = true
-    scheduler.scheduleAtFixedRate(() => heartbeat(event.getJDA), 15, 15, TimeUnit.SECONDS)
 
     event.getJDA.updateCommands().addCommands(
       commandsSeq
