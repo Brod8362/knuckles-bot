@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.events.session.{ReadyEvent, ShutdownEvent}
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.{EmbedBuilder, JDA, JDABuilder}
 import pw.byakuren.knuckles.commands.{InviteCommand, MemeCommand, StopCommand, UnhomeCommand}
-import pw.byakuren.knuckles.external.{APIAnalytics, PhonyShardAPIWrapper, ShardAPIWrapper}
+import pw.byakuren.knuckles.external.{APIAnalytics, DummyAPIAnalytics, PhonyShardAPIWrapper, ShardAPIWrapper}
 
 import java.awt.Color
 import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
@@ -17,11 +17,20 @@ import scala.util.control.Breaks.break
 
 object KnucklesBot extends ListenerAdapter {
 
-  val BOT_VERSION = "v0.6"
+  val BOT_VERSION = "v0.7"
+  val DEFAULT_CONFIG_PATH = "./config"
 
-  val botConfig: Map[String, String] = ConfigParser.parse("config")
+  val configPath: String = Option(System.getenv("KNUCKLES_CONFIG_PATH")).getOrElse(DEFAULT_CONFIG_PATH)
 
-  implicit val analytics: APIAnalytics = new APIAnalytics("knuckles", botConfig.getOrElse("analytics", "http://localhost:8086"))
+  val botConfig: Map[String, String] = ConfigParser.parse(configPath)
+
+  implicit val analytics: APIAnalytics = botConfig.get("solo") match {
+    case Some(_) =>
+      println("using dummy analytics")
+      DummyAPIAnalytics
+    case _ => new APIAnalytics("knuckles", botConfig.getOrElse("analytics", "http://localhost:8086"))
+  }
+
   val scheduler: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
   val shardAPI: ShardAPIWrapper = botConfig.get("solo") match {
     case Some(_) => PhonyShardAPIWrapper
