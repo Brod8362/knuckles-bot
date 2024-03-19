@@ -10,7 +10,9 @@ libraryDependencies ++= Seq(
   "net.dv8tion" % "JDA" % "5.0.0-alpha.22",
   "com.lihaoyi" %% "requests" % "0.7.1",
   "com.lihaoyi" %% "upickle" % "2.0.0",
-  "org.influxdb" % "influxdb-java" % "2.23"
+  "org.influxdb" % "influxdb-java" % "2.23",
+//  "org.scalactic" %% "scalactic" % "3.2.18" ,
+  "org.scalatest" %% "scalatest" % "3.2.18" % "test"
 )
 
 cancelable in Global := true
