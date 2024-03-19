@@ -6,7 +6,7 @@ package pw.byakuren.knuckles.i18n
  * @param variables The variables that this message expects
  * @param templates A map with keys set to locales (e.g, `en-US`) and the values set to the templates
  */
-case class TranslationGroup(messageId: String, variables: String, templates: Map[String, Substitution]) {
+case class TranslationGroup(messageId: String, templates: Map[String, Substitution]) {
   def supportsLocale(locale: String): Boolean = {
     templates.keys.exists(_ == locale)
   }

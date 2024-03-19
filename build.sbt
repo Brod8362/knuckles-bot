@@ -11,7 +11,6 @@ libraryDependencies ++= Seq(
   "com.lihaoyi" %% "requests" % "0.7.1",
   "com.lihaoyi" %% "upickle" % "2.0.0",
   "org.influxdb" % "influxdb-java" % "2.23",
-//  "org.scalactic" %% "scalactic" % "3.2.18" ,
   "org.scalatest" %% "scalatest" % "3.2.18" % "test"
 )
 

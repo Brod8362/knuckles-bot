@@ -5,7 +5,7 @@ object Translations extends Enumeration {
   val EXAMPLE_MESSAGE_ID = ""
 }
 
-class Translations(implicit defaultLocale: String, groups: Seq[TranslationGroup]) {
+class Translations(defaultLocale: String, groups: Seq[TranslationGroup]) {
 
   private val translationGroups: Map[String, TranslationGroup] = groups.map(k => (k.messageId, k)).toMap
 
@@ -14,8 +14,7 @@ class Translations(implicit defaultLocale: String, groups: Seq[TranslationGroup]
       case Some(group) =>
         group.apply(locale, defaultLocale).map(_.apply(substitutions:_*))
       case None => {
-        //invalid translation ID
-        None
+        throw MessageIdException(resourceString)
       }
     }
   }
