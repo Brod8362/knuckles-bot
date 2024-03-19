@@ -26,7 +26,7 @@ class SubstitutionSpec extends AnyFlatSpec {
   it should "substitute the text correctly" in {
     val substitution = Substitution("abc <v1> <v2>", Seq("v1", "v2"))
     val result = substitution(("v1", "123"), ("v2", "def"))
-    assert(result == "abc 123 def")
+    assertResult("abc 123 def")(result)
   }
 
   it should "substitute the text correctly in different locales" in {
@@ -46,7 +46,7 @@ class SubstitutionSpec extends AnyFlatSpec {
       val subMaybe = translationGroup(locale)
       assert(subMaybe.isDefined)
       val result = subMaybe.get.apply(("v1", "abc"), ("v2", "123"))
-      assert(result == expected)
+      assertResult(expected)(result)
     }
   }
 

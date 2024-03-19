@@ -4,9 +4,6 @@ import java.io.File
 import java.nio.file.{Files, Path}
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.CollectionHasAsScala
-import scala.util.matching.Regex
-
-sealed trait ParserState
 
 
 class TranslationParser {
@@ -22,6 +19,10 @@ class TranslationParser {
     parse(lines, defaultLocale)
   }
 
+  def parse(file: File, defaultLocale: String): Translations = {
+    parse(file.toPath, defaultLocale)
+  }
+
   def parse(lines: Iterable[String], defaultLocale: String): Translations = {
     lines.zipWithIndex.foreach({k =>
       try {
@@ -29,7 +30,7 @@ class TranslationParser {
       } catch {
         case inner: Throwable =>
           //rethrow, wrapped, with line #
-          throw TranslationsParserException(inner, k._2)
+          throw TranslationsParserException(inner, k._2+1)
       }
     })
 
@@ -40,7 +41,6 @@ class TranslationParser {
     currentMessageVariables = None
     currentMessageSubstitutions.clear()
     t
-
   }
 
   private def parseLine(line: String): Unit = {
@@ -68,21 +68,21 @@ class TranslationParser {
           throw TranslationSyntaxError("expected message ID and vars (ex: '# id : <v1>,<v2>')")
       }
 
-      val idRaw = splitLine.head
-      val varsRaw = splitLine.last
+      val idRaw = splitLine.head.strip()
+      val varsRaw = splitLine.last.strip()
       //TODO: probably enforce conformance as far as allowed message IDs
-      currentMessageId = Some(idRaw.strip())
+      currentMessageId = Some(idRaw)
 
       if (!varsRaw.startsWith("<")) {
-        throw TranslationSyntaxError(s"< expected in '$v''")
+        throw TranslationSyntaxError(s"< expected in '$varsRaw''")
       }
 
       if (!varsRaw.endsWith(">")) {
-        throw TranslationSyntaxError(s"> expected in '$v'")
+        throw TranslationSyntaxError(s"> expected in '$varsRaw'")
       }
 
       val varsProcessed = varsRaw // "<r1, r2, r3>"
-        .substring(1, varsRaw.length-2)  // "r1, r2, r3"
+        .substring(1, varsRaw.length-1)  // "r1, r2, r3"
         .split(",") // ["r1", " r2", " r3"]
         .map(_.strip()) // ["r1", "r2", "r3"]
 
@@ -114,23 +114,23 @@ class TranslationParser {
       //primarily concerned with making sure all of the variables exist and that no extras are defined
       val variablePattern = "<\\w+>".r
       val matches = variablePattern.findAllIn(messageOrLocaleRef)
-      val variableNames = matches.map(v => v.substring(1, v.length-2)) // turn "<v1>" → "v1"
+      val variableNames = matches.map(v => v.substring(1, v.length-1)).toSeq // turn "<v1>" → "v1"
 
       currentMessageVariables match {
         case Some(expectedVariables) =>
-          val missing = expectedVariables.filter(v => !variableNames.contains(v))
+          val missing = expectedVariables.filter(v => !variableNames.contains(v)) //values which are expected but not provided
           if (missing.nonEmpty) {
             throw TranslationSyntaxError(s"message missing variable references '${missing.mkString(",")}'")
           }
-          val extraneous = variableNames.filter(v => !expectedVariables.contains(v))
+          val extraneous = variableNames.filter(v => !expectedVariables.contains(v)) //values which are provided but not expected
           if (extraneous.nonEmpty) {
             throw TranslationSyntaxError(s"message has extraneous variable references '${extraneous.mkString(",")}'")
           }
           //variables line up... message should be ok
-        currentMessageSubstitutions(locale) = Substitution(messageOrLocaleRef, variableNames.toSeq)
+          currentMessageSubstitutions(locale) = Substitution(messageOrLocaleRef, variableNames)
         case None =>
           //variables not defined, this should not happen
-        throw new RuntimeException("expected variables should have been defined, but aren't")
+          throw new RuntimeException("expected variables should have been defined, but aren't")
       }
     }
   }

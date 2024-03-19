@@ -1,0 +1,10 @@
+# say-hello: <name>
+
+en-US: Hello, <name>!
+en-GB: @en-US
+ja-JP: こんにちは、<name>！
+
+# counting-in-vars: <v1,v2,v3>
+
+en-US: <v1>, <v2>, <v3>
+ja-JP: @en-US

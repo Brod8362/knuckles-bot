@@ -17,14 +17,14 @@ class TranslationsSpec extends AnyFlatSpec {
     implicit val locale: String = "ja-JP"
     val result = translationsObject.apply("message", ("v1", "a"), ("v2", "b"))
     assert(result.isDefined)
-    assert(result.get == "〇〇 a b")
+    assertResult("〇〇 a b")(result.get)
   }
 
   it should "fallback to the default locale when the requested locale is not available" in {
     implicit val locale: String = "fake"
     val result = translationsObject.apply("message", ("v1", "a"), ("v2", "b"))
     assert(result.isDefined)
-    assert(result.get == "test a b")
+    assertResult("test a b")(result.get)
   }
 
   it should "throw an exception if the message ID doesn't exist" in {
