@@ -54,7 +54,6 @@ class MemeCommand()(implicit i18n: Translations)
   def denyFiles: Array[File] = new File("deny").listFiles()
 
   override def commandData: SlashCommandData = {
-    //TODO: implement i18n here
     val name = i18n.default(Translations.MEME_COMMAND_ARGUMENT_NAME)
     val desc = i18n.default(Translations.MEME_COMMAND_ARGUMENT_DESC)
     super.commandData.addOption(OptionType.STRING, name, desc, false)
