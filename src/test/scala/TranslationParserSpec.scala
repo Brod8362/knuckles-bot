@@ -5,9 +5,8 @@ import scala.io.Source
 
 class TranslationParserSpec extends AnyFlatSpec {
 
-  val translationParser = new TranslationParser("en-US")
-
   "A translation parser" should "correctly parse a well-formed file" in {
+    val translationParser = new TranslationParser("en-US")
     val lines = Source.fromResource("good.i18n").getLines.toSeq
     val translation = translationParser.parse(lines)
     val result = translation.apply("say-hello", ("name", "Joe"))("en-US")
@@ -15,10 +14,18 @@ class TranslationParserSpec extends AnyFlatSpec {
   }
 
   it should "throw an exception if any message is not available in the default language" in {
+    val translationParser = new TranslationParser("en-US")
     val lines = Source.fromResource("missing_default.i18n").getLines.toSeq
     assertThrows[TranslationSyntaxError] {
       translationParser.parse(lines)
     }
   }
 
+  it should "allow empty argument lists" in {
+    val translationParser = new TranslationParser("en-US")
+    val lines = Source.fromResource("empty_arg_list.i18n").getLines.toSeq
+    val translation = translationParser.parse(lines)
+    val result = translation.apply("empty-arg-list")("en-US")
+    assertResult("placeholder")(result)
+  }
 }

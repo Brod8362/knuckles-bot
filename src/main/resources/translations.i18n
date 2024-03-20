@@ -1,39 +1,39 @@
-# meme-command-name:
+# meme-command-name: <>
 
 en-US: meme
 
-# meme-command-desc:
+# meme-command-desc: <>
 
 en-US: Submit your meme for knuckles to rate!
 
-# invite-command-name:
+# invite-command-name: <>
 
 en-US: invite
 
-# invite-command-desc:
+# invite-command-desc: <>
 
 en-US: Get an invite link for knuckles!
 
-# stop-command-name:
+# stop-command-name: <>
 
 en-US: stop
 
-# stop-command-des:
+# stop-command-desc: <>
 
 en-US: stop bot
 
-# debug-command-name:
+# debug-command-name: <>
 
 en-US: debug
 
-# debug-command-desc:
+# debug-command-desc: <>
 
 en-US: for debugging purposes
 
-# unhome-command-name:
+# unhome-command-name: <>
 
 en-US: unhome
 
-# unhome-command-desc:
+# unhome-command-desc: <>
 
 en-US: remove home commands from a previous home server

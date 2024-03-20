@@ -52,4 +52,11 @@ class Translations(defaultLocale: String, groups: Seq[TranslationGroup]) {
         case p if p._1.asDiscordLocale.isDefined => (p._1.asDiscordLocale.get, p._2)
       }
   }
+
+  def exists(messageId: String, locale: String): Boolean = {
+    translationGroups
+      .get(messageId)
+      .map(_.templates.get(locale))
+      .isDefined
+  }
 }

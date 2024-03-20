@@ -100,7 +100,12 @@ class TranslationParser(val defaultLocale: String) {
         .split(",") // ["r1", " r2", " r3"]
         .map(_.strip()) // ["r1", "r2", "r3"]
 
-      currentMessageVariables = Some(varsProcessed)
+      if (!varsProcessed.exists(_.nonEmpty)) {
+        currentMessageVariables = Some(Nil)
+      } else {
+        currentMessageVariables = Some(varsProcessed)
+      }
+
       return
     }
 
