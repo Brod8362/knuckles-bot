@@ -7,22 +7,29 @@ import net.dv8tion.jda.api.events.guild.{GuildJoinEvent, GuildLeaveEvent}
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.session.{ReadyEvent, ShutdownEvent}
 import net.dv8tion.jda.api.hooks.ListenerAdapter
-import net.dv8tion.jda.api.{EmbedBuilder, JDA, JDABuilder}
+import net.dv8tion.jda.api.{EmbedBuilder, JDABuilder}
 import pw.byakuren.knuckles.commands.{InviteCommand, MemeCommand, StopCommand, UnhomeCommand}
-import pw.byakuren.knuckles.external.{APIAnalytics, DummyAPIAnalytics, PhonyShardAPIWrapper, ShardAPIWrapper}
+import pw.byakuren.knuckles.external.{APIAnalytics, DummyAPIAnalytics}
+import pw.byakuren.knuckles.i18n.{TranslationParser, Translations}
 
 import java.awt.Color
-import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
-import scala.util.control.Breaks.break
+import scala.io.Source
 
 object KnucklesBot extends ListenerAdapter {
 
   val BOT_VERSION = "v0.8"
   val DEFAULT_CONFIG_PATH = "./config"
+  val DEFAULT_LOCALE = "en-US"
 
   val configPath: String = Option(System.getenv("KNUCKLES_CONFIG_PATH")).getOrElse(DEFAULT_CONFIG_PATH)
 
   val botConfig: Map[String, String] = ConfigParser.parse(configPath)
+
+  implicit val i18n: Translations = {
+    val parser = new TranslationParser(DEFAULT_LOCALE)
+    val fileFromResources = Source.fromResource("translations.i18n").getLines().toSeq
+    parser.parse(fileFromResources)
+  }
 
   implicit val analytics: APIAnalytics = botConfig.get("solo") match {
     case Some(_) =>
@@ -32,10 +39,10 @@ object KnucklesBot extends ListenerAdapter {
   }
 
   val commandsSeq = Seq(
-    InviteCommand,
-    MemeCommand,
-    StopCommand,
-    UnhomeCommand
+    new InviteCommand(),
+    new MemeCommand(),
+    new StopCommand(),
+    new UnhomeCommand()
   )
 
   def main(args: Array[String]): Unit = {

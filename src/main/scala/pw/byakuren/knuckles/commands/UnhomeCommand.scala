@@ -8,7 +8,7 @@ import pw.byakuren.knuckles.i18n.Translations
 
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
-class UnhomeCommand(implicit i18n: Translations) extends
+class UnhomeCommand()(implicit i18n: Translations) extends
   BotCommand(Translations.UNHOME_COMMAND_NAME, Translations.UNHOME_COMMAND_DESC, restricted = true) {
   override def onSlash(event: SlashCommandInteractionEvent)(implicit analytics: APIAnalytics): Unit = {
     val id: String = event.getOption("server_id").getAsString

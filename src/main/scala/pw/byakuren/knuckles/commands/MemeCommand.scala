@@ -9,7 +9,7 @@ import pw.byakuren.knuckles.i18n.Translations
 import java.io.File
 import java.util.Random
 
-class MemeCommand(implicit i18n: Translations)
+class MemeCommand()(implicit i18n: Translations)
   extends BotCommand(Translations.MEME_COMMAND_NAME, Translations.MEME_COMMAND_DESC) {
 
   private val random = new Random()
