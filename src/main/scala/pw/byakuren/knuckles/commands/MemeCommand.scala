@@ -15,7 +15,7 @@ class MemeCommand()(implicit i18n: Translations)
   private val random = new Random()
 
   override def onSlash(event: SlashCommandInteractionEvent)(implicit analytics: APIAnalytics): Unit = {
-
+    implicit val locale: String = event.getUserLocale.getLocale
     Option(event.getOption("the_meme")) match {
       case Some(param) =>
         val opt = Math.abs(param.getAsString.hashCode() + event.getUser.getId.hashCode)
@@ -24,8 +24,10 @@ class MemeCommand()(implicit i18n: Translations)
         } else {
           denyFiles(opt % denyFiles.length)
         }
+
+        val messageContent = i18n(Translations.MEME_COMMAND_REPLY, ("input", param.getAsString.replaceAll("`", "")))
         event
-          .reply(s"Knuckles has rated `${param.getAsString.replaceAll("`", "")}`")
+          .reply(messageContent)
           .addFiles(FileUpload.fromData(file)).queue()
       case _ =>
         val file = if (random.nextBoolean()) {
@@ -52,6 +54,7 @@ class MemeCommand()(implicit i18n: Translations)
   def denyFiles: Array[File] = new File("deny").listFiles()
 
   override def commandData: SlashCommandData = {
+    //TODO: implement i18n here
     super.commandData.addOption(OptionType.STRING, "the_meme", "What meme should knuckles rate?", false)
   }
 }

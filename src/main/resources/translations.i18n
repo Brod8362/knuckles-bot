@@ -1,44 +1,58 @@
 # meme-command-name: <>
-
 en-US: meme
 
 # meme-command-desc: <>
-
 en-US: Submit your meme for knuckles to rate!
 ja: 〇〇
 
-# invite-command-name: <>
+# meme-command-argument-desc: <>
+en-US: What meme should knuckles rate?
 
+# meme-command-reply: <input>
+en-US: Knuckles has rated `<input>`
+
+# invite-command-name: <>
 en-US: invite
 
 # invite-command-desc: <>
-
 en-US: Get an invite link for knuckles!
 ja: ナックルズの招待は受けています
 
 # stop-command-name: <>
-
 en-US: stop
 
 # stop-command-desc: <>
-
 en-US: stop bot
 ja: ナックルズは止まります
 
 # debug-command-name: <>
-
 en-US: debug
 
 # debug-command-desc: <>
-
 en-US: for debugging purposes
 ja: デバッグ
 
 # unhome-command-name: <>
-
 en-US: unhome
 
 # unhome-command-desc: <>
-
 en-US: remove home commands from a previous home server
 ja: TODO
+
+# cmd-permission-denied: <>
+en-US: Knuckles says: no way!
+
+# cmd-not-found: <>
+en-US: Sorry, command not found. This is an error and should be reported.
+
+# guild-join-msg-header: <>
+en-US: Thanks for adding Knuckles!
+
+# guild-join-msg-body: <>
+en-US: Thanks for adding Knuckles! If you need help, you can join the support server.
+
+# support-server-text: <>
+en-US: Support Server
+
+# source-code-text: <>
+en-US: Source Code

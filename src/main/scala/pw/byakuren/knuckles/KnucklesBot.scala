@@ -19,7 +19,7 @@ object KnucklesBot extends ListenerAdapter {
 
   val BOT_VERSION = "v0.8"
   val DEFAULT_CONFIG_PATH = "./config"
-  val DEFAULT_LOCALE = "en-US"
+  implicit val DEFAULT_LOCALE = "en-US"
 
   private val configPath: String = Option(System.getenv("KNUCKLES_CONFIG_PATH")).getOrElse(DEFAULT_CONFIG_PATH)
 
@@ -121,12 +121,12 @@ object KnucklesBot extends ListenerAdapter {
       case Some(command) =>
         if (command.restricted && event.getUser.getIdLong != event.getJDA.retrieveApplicationInfo().complete().getOwner.getIdLong) {
           //insufficient permissions
-          event.reply("Knuckles says: no way!").setEphemeral(true).queue()
+          event.reply(i18n(Translations.CMD_PERMISSION_DENIED)).setEphemeral(true).queue()
           return
         }
         command.onSlash(event)
       case _ =>
-        event.reply("Sorry, command not found. This is an error and should be reported.").setEphemeral(true).queue()
+        event.reply(i18n(Translations.CMD_NOT_FOUND)).setEphemeral(true).queue()
     }
 
   }
@@ -134,14 +134,12 @@ object KnucklesBot extends ListenerAdapter {
   override def onGuildJoin(event: GuildJoinEvent): Unit = {
     guildUpdate(joined = true, event.getGuild)
     val embed = new EmbedBuilder()
-      .setTitle("Thanks for adding Knuckles!")
+      .setTitle(i18n(Translations.GUILD_JOIN_MSG_HEADER))
       .setColor(Color.RED)
-      .setDescription("Thanks for adding Knuckles! If you need help, you can join the support server.\n" +
-        "It would also be greatly appreciated if you could fill out the knuckles user survey!\nThanks again!")
+      .setDescription(i18n(Translations.GUILD_JOIN_MSG_BODY))
       .setThumbnail(event.getJDA.getSelfUser.getEffectiveAvatarUrl)
-      .addField("Support Server", "https://discord.gg/3Scnd3GvCn", false)
-      .addField("User Survey", "https://forms.gle/gvJGHf6NGyALuQVs9", false)
-      .addField("Source Code", "https://github.com/Brod8362/knuckles-bot", false)
+      .addField(i18n(Translations.SUPPORT_SERVER_TEXT), "https://discord.gg/3Scnd3GvCn", false)
+      .addField(i18n(Translations.SOURCE_CODE_TEXT), "https://github.com/Brod8362/knuckles-bot", false)
       .build()
     event.getGuild.getDefaultChannel.asTextChannel().sendMessageEmbeds(embed).queue()
   }

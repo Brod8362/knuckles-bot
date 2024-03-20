@@ -15,6 +15,14 @@ object Translations extends Enumeration {
   val STOP_COMMAND_DESC = "stop-command-desc"
   val UNHOME_COMMAND_NAME = "unhome-command-name"
   val UNHOME_COMMAND_DESC = "unhome-command-desc"
+  val CMD_PERMISSION_DENIED = "cmd-permission-denied"
+  val CMD_NOT_FOUND = "cmd-not-found"
+  val GUILD_JOIN_MSG_HEADER = "guild-join-msg-header"
+  val GUILD_JOIN_MSG_BODY = "guild-join-msg-body"
+  val SUPPORT_SERVER_TEXT = "support-server-text"
+  val SOURCE_CODE_TEXT = "source-code-text"
+  val MEME_COMMAND_REPLY = "meme-command-reply"
+  val MEME_COMMAND_ARGUMENT_DESC = "meme-command-argument-desc"
 }
 
 class Translations(defaultLocale: String, groups: Seq[TranslationGroup]) {
