@@ -38,12 +38,12 @@ class TranslationsSpec extends AnyFlatSpec {
       translationsObject.sub("message", ("v1", "a"))
     }
   }
+
   it should "throw an exception if too many replacements are not provided" in {
     implicit val locale: String = "en-US"
     assertThrows[ExcessVariableException] {
       translationsObject.sub("message", ("v1", "a"), ("v2", "b"), ("v3", "c"))
     }
   }
-
 
 }

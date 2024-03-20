@@ -9,7 +9,9 @@ class AllTranslationsUsedSpec extends AnyFlatSpec {
     val file = new File("src/main/resources/translations.i18n")
     val parser = new TranslationParser("en-US")
     val i18n = parser.parse(file)
+    //TODO: this test is not working properly
     for (messageId <- Translations.values) {
+      print(messageId)
       assert(i18n.exists(messageId.toString, "en-US"))
     }
   }

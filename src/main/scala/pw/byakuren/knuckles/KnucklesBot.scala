@@ -19,7 +19,7 @@ object KnucklesBot extends ListenerAdapter {
 
   val BOT_VERSION = "v0.8"
   val DEFAULT_CONFIG_PATH = "./config"
-  implicit val DEFAULT_LOCALE = "en-US"
+  implicit val DEFAULT_LOCALE: String = "en-US"
 
   private val configPath: String = Option(System.getenv("KNUCKLES_CONFIG_PATH")).getOrElse(DEFAULT_CONFIG_PATH)
 

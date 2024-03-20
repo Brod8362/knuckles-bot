@@ -23,5 +23,9 @@ class UnhomeCommand()(implicit i18n: Translations) extends
     }
   }
 
-  override def commandData: SlashCommandData = super.commandData.addOption(OptionType.STRING, "server_id", "the old server id", true)
+  override def commandData: SlashCommandData = {
+    val name = i18n.default(Translations.UNHOME_COMMAND_ARGUMENT_NAME)
+    val desc = i18n.default(Translations.UNHOME_COMMAND_ARGUMENT_DESC)
+    super.commandData.addOption(OptionType.STRING, name, desc, true)
+  }
 }

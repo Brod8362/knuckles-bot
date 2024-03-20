@@ -42,6 +42,12 @@ en-US: unhome
 en-US: remove home commands from a previous home server
 ja: TODO
 
+# unhome.options.server_id.name: <>
+en-US: server_id
+
+# unhome.options.server_id.description: <>
+en-US: the old server id
+
 # cmd-permission-denied: <>
 en-US: Knuckles says: no way!
 
