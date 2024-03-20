@@ -3,11 +3,23 @@ package pw.byakuren.knuckles.commands
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.build.{Commands, SlashCommandData}
 import pw.byakuren.knuckles.external.APIAnalytics
+import pw.byakuren.knuckles.i18n.Translations
 
-abstract case class BotCommand(name: String, description: String = "", restricted: Boolean = false) {
+import scala.jdk.CollectionConverters.MapHasAsJava
+
+abstract case class BotCommand(nameTranslationId: String, descriptionTranslationId: String, restricted: Boolean = false)
+                              (implicit i18n: Translations) {
 
   def onSlash(event: SlashCommandInteractionEvent)(implicit analytics: APIAnalytics): Unit
 
-  def commandData: SlashCommandData = Commands.slash(this.name, this.description)
+  def commandData: SlashCommandData = {
+    val defaultName = i18n.default(nameTranslationId)
+    val defaultDescription = i18n.default(descriptionTranslationId)
+    val additionalNames = i18n.asDiscord(nameTranslationId)
+    val additionalDescriptions = i18n.asDiscord(descriptionTranslationId)
+    Commands.slash(defaultName, defaultDescription)
+      .setNameLocalizations(additionalNames.asJava)
+      .setDescriptionLocalizations(additionalDescriptions.asJava)
+  }
 
 }

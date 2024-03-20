@@ -3,8 +3,9 @@ package pw.byakuren.knuckles.commands
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import pw.byakuren.knuckles.external.APIAnalytics
+import pw.byakuren.knuckles.i18n.Translations
 
-object InviteCommand extends BotCommand("invite", "Get an invite link for knuckles!") {
+class InviteCommand(implicit i18n: Translations) extends BotCommand("invite", "Get an invite link for knuckles!") {
 
   def generateInvite(jda: JDA): String = {
     val botUser = jda.getSelfUser

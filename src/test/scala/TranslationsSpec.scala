@@ -27,7 +27,7 @@ class TranslationsSpec extends AnyFlatSpec {
 
   it should "throw an exception if the message ID doesn't exist" in {
     implicit val locale: String = "en-US"
-    assertThrows[MessageIdException] { //TODO: more specific exception
+    assertThrows[MessageIdException] {
       translationsObject.apply("fake-message", ("v1", "a"), ("v2", "b"))
     }
   }

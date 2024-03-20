@@ -4,11 +4,13 @@ import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
 import net.dv8tion.jda.api.utils.FileUpload
 import pw.byakuren.knuckles.external.APIAnalytics
+import pw.byakuren.knuckles.i18n.Translations
 
 import java.io.File
 import java.util.Random
 
-object MemeCommand extends BotCommand("meme", "Submit your meme for knuckles to rate!") {
+class MemeCommand(implicit i18n: Translations)
+  extends BotCommand(Translations.MEME_COMMAND_NAME, Translations.MEME_COMMAND_DESC) {
 
   private val random = new Random()
 

@@ -4,8 +4,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
 import pw.byakuren.knuckles.KnucklesBot
 import pw.byakuren.knuckles.external.{APIAnalytics, ShardAPIWrapper}
+import pw.byakuren.knuckles.i18n.Translations
 
-class DebugCommand(config: Map[String, String], shardAPIWrapper: ShardAPIWrapper) extends BotCommand("debug", "for debugging purposes", true) {
+class DebugCommand(config: Map[String, String], shardAPIWrapper: ShardAPIWrapper)(implicit i18n: Translations)
+  extends BotCommand(Translations.DEBUG_COMMAND_NAME, Translations.DEBUG_COMMAND_DESC, true) {
   override def onSlash(event: SlashCommandInteractionEvent)(implicit analytics: APIAnalytics): Unit = {
     val feature = event.getOption("feature").getAsString
     feature match {

@@ -4,10 +4,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
 import pw.byakuren.knuckles.external.APIAnalytics
+import pw.byakuren.knuckles.i18n.Translations
 
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
-object UnhomeCommand extends BotCommand("unhome", "remove home commands from a previous home server", restricted = true) {
+class UnhomeCommand(implicit i18n: Translations) extends
+  BotCommand(Translations.UNHOME_COMMAND_NAME, Translations.UNHOME_COMMAND_DESC, restricted = true) {
   override def onSlash(event: SlashCommandInteractionEvent)(implicit analytics: APIAnalytics): Unit = {
     val id: String = event.getOption("server_id").getAsString
     Option(event.getJDA.getGuildById(id)) match {

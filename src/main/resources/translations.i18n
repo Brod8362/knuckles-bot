@@ -1,0 +1,39 @@
+# meme-command-name:
+
+en-US: meme
+
+# meme-command-desc:
+
+en-US: Submit your meme for knuckles to rate!
+
+# invite-command-name:
+
+en-US: invite
+
+# invite-command-desc:
+
+en-US: Get an invite link for knuckles!
+
+# stop-command-name:
+
+en-US: stop
+
+# stop-command-des:
+
+en-US: stop bot
+
+# debug-command-name:
+
+en-US: debug
+
+# debug-command-desc:
+
+en-US: for debugging purposes
+
+# unhome-command-name:
+
+en-US: unhome
+
+# unhome-command-desc:
+
+en-US: remove home commands from a previous home server
