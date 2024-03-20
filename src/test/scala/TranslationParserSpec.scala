@@ -9,7 +9,7 @@ class TranslationParserSpec extends AnyFlatSpec {
     val translationParser = new TranslationParser("en-US")
     val lines = Source.fromResource("good.i18n").getLines.toSeq
     val translation = translationParser.parse(lines)
-    val result = translation.apply("say-hello", ("name", "Joe"))("en-US")
+    val result = translation.sub("say-hello", ("name", "Joe"))("en-US")
     assertResult("Hello, Joe!")(result)
   }
 
@@ -25,7 +25,7 @@ class TranslationParserSpec extends AnyFlatSpec {
     val translationParser = new TranslationParser("en-US")
     val lines = Source.fromResource("empty_arg_list.i18n").getLines.toSeq
     val translation = translationParser.parse(lines)
-    val result = translation.apply("empty-arg-list")("en-US")
+    val result = translation.sub("empty-arg-list")("en-US")
     assertResult("placeholder")(result)
   }
 }

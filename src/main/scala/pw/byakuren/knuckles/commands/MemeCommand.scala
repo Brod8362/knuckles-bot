@@ -25,7 +25,7 @@ class MemeCommand()(implicit i18n: Translations)
           denyFiles(opt % denyFiles.length)
         }
 
-        val messageContent = i18n(Translations.MEME_COMMAND_REPLY, ("input", param.getAsString.replaceAll("`", "")))
+        val messageContent = i18n.sub(Translations.MEME_COMMAND_REPLY, ("input", param.getAsString.replaceAll("`", "")))
         event
           .reply(messageContent)
           .addFiles(FileUpload.fromData(file)).queue()

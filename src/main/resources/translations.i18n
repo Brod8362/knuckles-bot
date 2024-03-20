@@ -1,41 +1,44 @@
-# meme-command-name: <>
+# meme.name: <>
 en-US: meme
 
-# meme-command-desc: <>
+# meme.description: <>
 en-US: Submit your meme for knuckles to rate!
 ja: 〇〇
 
-# meme-command-argument-desc: <>
+# meme.options.the_meme.name: <>
+en-US: the_meme
+
+# meme.options.the_meme.description: <>
 en-US: What meme should knuckles rate?
 
 # meme-command-reply: <input>
 en-US: Knuckles has rated `<input>`
 
-# invite-command-name: <>
+# invite.name: <>
 en-US: invite
 
-# invite-command-desc: <>
+# invite.description: <>
 en-US: Get an invite link for knuckles!
 ja: ナックルズの招待は受けています
 
-# stop-command-name: <>
+# stop.name: <>
 en-US: stop
 
-# stop-command-desc: <>
+# stop.description: <>
 en-US: stop bot
 ja: ナックルズは止まります
 
-# debug-command-name: <>
+# debug.name: <>
 en-US: debug
 
-# debug-command-desc: <>
+# debug.description: <>
 en-US: for debugging purposes
 ja: デバッグ
 
-# unhome-command-name: <>
+# unhome.name: <>
 en-US: unhome
 
-# unhome-command-desc: <>
+# unhome.description: <>
 en-US: remove home commands from a previous home server
 ja: TODO
 

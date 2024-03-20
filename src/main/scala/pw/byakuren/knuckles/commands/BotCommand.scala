@@ -17,11 +17,8 @@ abstract case class BotCommand(nameTranslationId: String, descriptionTranslation
   def commandData: SlashCommandData = {
     val defaultName = i18n.default(nameTranslationId)
     val defaultDescription = i18n.default(descriptionTranslationId)
-    val additionalNames = i18n.asDiscord(nameTranslationId)
-    val additionalDescriptions = i18n.asDiscord(descriptionTranslationId)
-    Commands.slash(defaultName, defaultDescription)
-      .setNameLocalizations(additionalNames.asJava)
-      .setDescriptionLocalizations(additionalDescriptions.asJava)
+    Commands.slash(defaultName, defaultDescription).setLocalizationFunction(i18n)
+
   }
 
 }

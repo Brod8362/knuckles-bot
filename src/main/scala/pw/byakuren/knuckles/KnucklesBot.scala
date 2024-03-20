@@ -121,25 +121,26 @@ object KnucklesBot extends ListenerAdapter {
       case Some(command) =>
         if (command.restricted && event.getUser.getIdLong != event.getJDA.retrieveApplicationInfo().complete().getOwner.getIdLong) {
           //insufficient permissions
-          event.reply(i18n(Translations.CMD_PERMISSION_DENIED)).setEphemeral(true).queue()
+          event.reply(i18n.sub(Translations.CMD_PERMISSION_DENIED)).setEphemeral(true).queue()
           return
         }
         command.onSlash(event)
       case _ =>
-        event.reply(i18n(Translations.CMD_NOT_FOUND)).setEphemeral(true).queue()
+        event.reply(i18n.sub(Translations.CMD_NOT_FOUND)).setEphemeral(true).queue()
     }
 
   }
 
   override def onGuildJoin(event: GuildJoinEvent): Unit = {
     guildUpdate(joined = true, event.getGuild)
+    val locale = event.getGuild.getLocale.getLocale
     val embed = new EmbedBuilder()
-      .setTitle(i18n(Translations.GUILD_JOIN_MSG_HEADER))
+      .setTitle(i18n.sub(Translations.GUILD_JOIN_MSG_HEADER)(locale))
       .setColor(Color.RED)
-      .setDescription(i18n(Translations.GUILD_JOIN_MSG_BODY))
+      .setDescription(i18n.sub(Translations.GUILD_JOIN_MSG_BODY)(locale))
       .setThumbnail(event.getJDA.getSelfUser.getEffectiveAvatarUrl)
-      .addField(i18n(Translations.SUPPORT_SERVER_TEXT), "https://discord.gg/3Scnd3GvCn", false)
-      .addField(i18n(Translations.SOURCE_CODE_TEXT), "https://github.com/Brod8362/knuckles-bot", false)
+      .addField(i18n.sub(Translations.SUPPORT_SERVER_TEXT)(locale), "https://discord.gg/3Scnd3GvCn", false)
+      .addField(i18n.sub(Translations.SOURCE_CODE_TEXT)(locale), "https://github.com/Brod8362/knuckles-bot", false)
       .build()
     event.getGuild.getDefaultChannel.asTextChannel().sendMessageEmbeds(embed).queue()
   }
