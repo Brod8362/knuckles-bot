@@ -5,6 +5,7 @@ en-US: meme
 # meme-command-desc: <>
 
 en-US: Submit your meme for knuckles to rate!
+ja: 〇〇
 
 # invite-command-name: <>
 
@@ -13,6 +14,7 @@ en-US: invite
 # invite-command-desc: <>
 
 en-US: Get an invite link for knuckles!
+ja: ナックルズの招待は受けています
 
 # stop-command-name: <>
 
@@ -21,6 +23,7 @@ en-US: stop
 # stop-command-desc: <>
 
 en-US: stop bot
+ja: ナックルズは止まります
 
 # debug-command-name: <>
 
@@ -29,6 +32,7 @@ en-US: debug
 # debug-command-desc: <>
 
 en-US: for debugging purposes
+ja: デバッグ
 
 # unhome-command-name: <>
 
@@ -37,3 +41,4 @@ en-US: unhome
 # unhome-command-desc: <>
 
 en-US: remove home commands from a previous home server
+ja: TODO

@@ -21,9 +21,9 @@ object KnucklesBot extends ListenerAdapter {
   val DEFAULT_CONFIG_PATH = "./config"
   val DEFAULT_LOCALE = "en-US"
 
-  val configPath: String = Option(System.getenv("KNUCKLES_CONFIG_PATH")).getOrElse(DEFAULT_CONFIG_PATH)
+  private val configPath: String = Option(System.getenv("KNUCKLES_CONFIG_PATH")).getOrElse(DEFAULT_CONFIG_PATH)
 
-  val botConfig: Map[String, String] = ConfigParser.parse(configPath)
+  private val botConfig: Map[String, String] = ConfigParser.parse(configPath)
 
   implicit val i18n: Translations = {
     val parser = new TranslationParser(DEFAULT_LOCALE)
@@ -31,14 +31,16 @@ object KnucklesBot extends ListenerAdapter {
     parser.parse(fileFromResources)
   }
 
-  implicit val analytics: APIAnalytics = botConfig.get("solo") match {
-    case Some(_) =>
-      println("using dummy analytics")
-      DummyAPIAnalytics
-    case _ => new APIAnalytics("knuckles", botConfig.getOrElse("analytics", "http://localhost:8086"))
+  private val runningStandalone = botConfig.contains("solo")
+
+  implicit val analytics: APIAnalytics = if (runningStandalone) {
+    println("using dummy analytics")
+    DummyAPIAnalytics
+  } else {
+    new APIAnalytics("knuckles", botConfig.getOrElse("analytics", "http://localhost:8086"))
   }
 
-  val commandsSeq = Seq(
+  private val commandsSeq = Seq(
     new InviteCommand(),
     new MemeCommand(),
     new StopCommand(),
@@ -46,13 +48,17 @@ object KnucklesBot extends ListenerAdapter {
   )
 
   def main(args: Array[String]): Unit = {
+
     val kubePodName = Option(System.getenv("KNUCKLES_POD_NAME")) match {
       case Some(t) => t
       case _ =>
-        println("environment variable KNUCKLES_POD_NAME not specified, exiting")
-        return
+        if (runningStandalone) {
+          "knuckles-0"
+        } else {
+          println("environment variable KNUCKLES_POD_NAME not specified, exiting")
+          return
+        }
     }
-    println(kubePodName)
 
     val maxShards = Option(System.getenv("KNUCKLES_MAX_SHARDS")) match {
       case Some(t) if t.toIntOption.isDefined => t.toIntOption.get
@@ -60,8 +66,12 @@ object KnucklesBot extends ListenerAdapter {
         println(s"failed to decode KNUCKLES_MAX_SHARDS=$t into int")
         return
       case _ =>
-        println("KNUCKLES_MAX_SHARDS not specified, exiting")
-        return
+        if (runningStandalone) {
+          1
+        } else {
+          println("KNUCKLES_MAX_SHARDS not specified, exiting")
+          return
+        }
     }
 
     val shardId = kubePodName.split("-").lastOption match {
