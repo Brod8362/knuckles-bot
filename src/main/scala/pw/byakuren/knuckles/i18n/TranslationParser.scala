@@ -6,7 +6,7 @@ import scala.collection.mutable
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 
-class TranslationParser {
+class TranslationParser(val defaultLocale: String) {
 
   private var currentMessageId: Option[String] = None
   private var currentMessageVariables: Option[Seq[String]] = None
@@ -14,16 +14,16 @@ class TranslationParser {
 
   private val finalizedMessages = mutable.ArrayBuffer[TranslationGroup]()
 
-  def parse(path: Path, defaultLocale: String): Translations = {
+  def parse(path: Path): Translations = {
     val lines = Files.readAllLines(path).asScala
-    parse(lines, defaultLocale)
+    parse(lines)
   }
 
-  def parse(file: File, defaultLocale: String): Translations = {
-    parse(file.toPath, defaultLocale)
+  def parse(file: File): Translations = {
+    parse(file.toPath)
   }
 
-  def parse(lines: Iterable[String], defaultLocale: String): Translations = {
+  def parse(lines: Iterable[String]): Translations = {
     lines.zipWithIndex.foreach({k =>
       try {
         this.parseLine(k._1.strip())
@@ -34,6 +34,11 @@ class TranslationParser {
       }
     })
 
+    currentMessageId match {
+      case Some(messageId) => pushCurrentStateAsTranslationGroup(messageId)
+      case None =>
+    }
+
     val t = new Translations(defaultLocale, finalizedMessages.toSeq)
 
     finalizedMessages.clear()
@@ -41,6 +46,19 @@ class TranslationParser {
     currentMessageVariables = None
     currentMessageSubstitutions.clear()
     t
+  }
+
+  private def pushCurrentStateAsTranslationGroup(messageId: String): Unit = {
+    val isMessageAvailableInDefaultLocale = currentMessageSubstitutions.contains(defaultLocale)
+    if (!isMessageAvailableInDefaultLocale) {
+      throw TranslationSyntaxError(s"missing translation in default locale ($defaultLocale) for $messageId")
+    }
+
+    val group = TranslationGroup(messageId, currentMessageSubstitutions.toMap)
+    currentMessageId = None
+    currentMessageVariables = None
+    currentMessageSubstitutions.clear()
+    finalizedMessages.append(group)
   }
 
   private def parseLine(line: String): Unit = {
@@ -52,12 +70,8 @@ class TranslationParser {
       currentMessageId match {
         // the current message ID is done parsing, so now we can move on to another one
         case Some(currentId) =>
+          pushCurrentStateAsTranslationGroup(currentId)
           //create a TranslationGroup out of the current info and push it onto the buffer
-          val group = TranslationGroup(currentId, currentMessageSubstitutions.toMap)
-          currentMessageId = None
-          currentMessageVariables = None
-          currentMessageSubstitutions.clear()
-          finalizedMessages.append(group)
         case None =>
           //this is the first id of the file
       }
