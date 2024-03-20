@@ -1,5 +1,5 @@
 import org.scalatest.flatspec.AnyFlatSpec
-import pw.byakuren.knuckles.i18n.{ExcessVariableException, MissingVariableException, Substitution, TranslationGroup, Translations}
+import pw.byakuren.knuckles.i18n.{ExcessVariableException, MessageIdException, MissingVariableException, Substitution, TranslationGroup, Translations}
 
 class TranslationsSpec extends AnyFlatSpec {
 
@@ -16,20 +16,18 @@ class TranslationsSpec extends AnyFlatSpec {
   "A Translations object" should "reply with the correct translation if the locale exists" in {
     implicit val locale: String = "ja-JP"
     val result = translationsObject.apply("message", ("v1", "a"), ("v2", "b"))
-    assert(result.isDefined)
-    assertResult("〇〇 a b")(result.get)
+    assertResult("〇〇 a b")(result)
   }
 
   it should "fallback to the default locale when the requested locale is not available" in {
     implicit val locale: String = "fake"
     val result = translationsObject.apply("message", ("v1", "a"), ("v2", "b"))
-    assert(result.isDefined)
-    assertResult("test a b")(result.get)
+    assertResult("test a b")(result)
   }
 
   it should "throw an exception if the message ID doesn't exist" in {
     implicit val locale: String = "en-US"
-    assertThrows[Exception] { //TODO: more specific exception
+    assertThrows[MessageIdException] { //TODO: more specific exception
       translationsObject.apply("fake-message", ("v1", "a"), ("v2", "b"))
     }
   }

@@ -11,8 +11,7 @@ class TranslationParserSpec extends AnyFlatSpec {
     val lines = Source.fromResource("good.i18n").getLines.toSeq
     val translation = translationParser.parse(lines)
     val result = translation.apply("say-hello", ("name", "Joe"))("en-US")
-    assert(result.isDefined)
-    assertResult("Hello, Joe!")(result.get)
+    assertResult("Hello, Joe!")(result)
   }
 
   it should "throw an exception if any message is not available in the default language" in {
