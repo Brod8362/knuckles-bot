@@ -3,65 +3,74 @@ en-US: meme
 
 # meme.description: <>
 en-US: Submit your meme for knuckles to rate!
-ja: 〇〇
+ja: ミームを提出してナックルズの評価を受ける
 
 # meme.options.the_meme.name: <>
 en-US: the_meme
 
 # meme.options.the_meme.description: <>
 en-US: What meme should knuckles rate?
+ja: ナックルズに評価してほしいミームは？
 
 # meme-command-reply: <input>
 en-US: Knuckles has rated `<input>`
+ja: ナックルズは`<input>`を評価しました
 
 # invite.name: <>
 en-US: invite
 
 # invite.description: <>
 en-US: Get an invite link for knuckles!
-ja: ナックルズの招待は受けています
+ja: ナックルズの招待リンクを表示
 
 # stop.name: <>
 en-US: stop
 
 # stop.description: <>
 en-US: stop bot
-ja: ナックルズは止まります
+ja: ナックルズを終了
 
 # debug.name: <>
 en-US: debug
 
 # debug.description: <>
 en-US: for debugging purposes
-ja: デバッグ
+ja: デバッグ用
 
 # unhome.name: <>
 en-US: unhome
 
 # unhome.description: <>
 en-US: remove home commands from a previous home server
-ja: TODO
+ja: 以前のホームサーバーからホームコマンドを削除
 
 # unhome.options.server_id.name: <>
 en-US: server_id
 
 # unhome.options.server_id.description: <>
 en-US: the old server id
+ja: 以前のサーバーID
 
 # cmd-permission-denied: <>
 en-US: Knuckles says: no way!
+ja: ナックルズは言う: 無理だ！
 
 # cmd-not-found: <>
 en-US: Sorry, command not found. This is an error and should be reported.
+ja: すみません、コマンドが見つかりません。これはエラーであるため開発者に報告をお願いします。
 
 # guild-join-msg-header: <>
 en-US: Thanks for adding Knuckles!
+ja: ナックルズを追加してくれてありがとう！
 
 # guild-join-msg-body: <>
 en-US: Thanks for adding Knuckles! If you need help, you can join the support server.
+ja: ナックルズを追加してくれてありがとう！サポートが必要な場合はサポートサーバーに参加してください。
 
 # support-server-text: <>
 en-US: Support Server
+ja: サポートサーバー
 
 # source-code-text: <>
 en-US: Source Code
+ja: ソースコード
