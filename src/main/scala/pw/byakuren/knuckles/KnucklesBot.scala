@@ -18,7 +18,7 @@ import scala.io.Source
 
 object KnucklesBot extends ListenerAdapter {
 
-  val BOT_VERSION = "v0.8"
+  val BOT_VERSION = "v0.9"
   val DEFAULT_CONFIG_PATH = "./config"
   implicit val DEFAULT_LOCALE: String = "en-US"
 
