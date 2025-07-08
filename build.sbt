@@ -7,7 +7,7 @@ scalaVersion := "2.13.2"
 resolvers += "jcenter-bintray" at "https://jcenter.bintray.com"
 
 libraryDependencies ++= Seq(
-  "net.dv8tion" % "JDA" % "5.0.0-alpha.22",
+  "net.dv8tion" % "JDA" % "5.6.1",
   "com.lihaoyi" %% "requests" % "0.7.1",
   "com.lihaoyi" %% "upickle" % "2.0.0",
   "org.influxdb" % "influxdb-java" % "2.23",

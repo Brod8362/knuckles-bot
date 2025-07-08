@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.guild.{GuildJoinEvent, GuildLeaveEvent}
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.session.{ReadyEvent, ShutdownEvent}
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import net.dv8tion.jda.api.sharding.{DefaultShardManager, DefaultShardManagerBuilder, ShardManager}
 import net.dv8tion.jda.api.{EmbedBuilder, JDABuilder}
 import pw.byakuren.knuckles.commands.{InviteCommand, MemeCommand, StopCommand, UnhomeCommand}
 import pw.byakuren.knuckles.external.{APIAnalytics, DummyAPIAnalytics}
@@ -31,13 +32,14 @@ object KnucklesBot extends ListenerAdapter {
     parser.parse(fileFromResources)
   }
 
-  private val runningStandalone = botConfig.contains("solo")
-
-  implicit val analytics: APIAnalytics = if (runningStandalone) {
-    println("using dummy analytics")
-    DummyAPIAnalytics
-  } else {
-    new APIAnalytics("knuckles", botConfig.getOrElse("analytics", "http://localhost:8086"))
+  implicit val analytics: APIAnalytics = botConfig.get("analytics") match {
+    case Some("disabled") =>
+      println("analytics disabled")
+      DummyAPIAnalytics
+    case Some(x) => new APIAnalytics("knuckles", x)
+    case None =>
+      println("analytics not provided, disabling")
+      DummyAPIAnalytics
   }
 
   private val commandsSeq = Seq(
@@ -49,45 +51,22 @@ object KnucklesBot extends ListenerAdapter {
 
   def main(args: Array[String]): Unit = {
 
-    val kubePodName = Option(System.getenv("KNUCKLES_POD_NAME")) match {
-      case Some(t) => t
-      case _ =>
-        if (runningStandalone) {
-          "knuckles-0"
-        } else {
-          println("environment variable KNUCKLES_POD_NAME not specified, exiting")
-          return
+    val shards = botConfig.get("shards") match {
+      case Some(x) =>
+        x.toIntOption match {
+          case Some(i) => i
+          case _ => throw new RuntimeException(s"failed to parse shards value '$x'")
         }
+      case None =>
+        analytics.log("shards value not provided, defaulting to 1")
+        1
     }
 
-    val maxShards = Option(System.getenv("KNUCKLES_MAX_SHARDS")) match {
-      case Some(t) if t.toIntOption.isDefined => t.toIntOption.get
-      case Some(t) =>
-        println(s"failed to decode KNUCKLES_MAX_SHARDS=$t into int")
-        return
-      case _ =>
-        if (runningStandalone) {
-          1
-        } else {
-          println("KNUCKLES_MAX_SHARDS not specified, exiting")
-          return
-        }
-    }
-
-    val shardId = kubePodName.split("-").lastOption match {
-      case Some(v) if v.toIntOption.isDefined => v.toIntOption.get
-      case Some(v) =>
-        println(s"failed to determine shard id from $v")
-        return
-      case _ =>
-        println("shard id doesn't seem to to be of the correct format (expected something like knuckles-shard-0)")
-        return
-    }
-    //this must not be nul
-    println(s"logging in as $shardId/$maxShards")
-    JDABuilder.createLight(botConfig("token"))
+    println(s"starting up with $shards shards")
+    DefaultShardManagerBuilder.createLight(botConfig("token"))
       .addEventListeners(this)
-      .useSharding(shardId, maxShards)
+      .setShardsTotal(shards)
+      .setShards(0, shards-1)
       .build()
   }
 
@@ -103,7 +82,6 @@ object KnucklesBot extends ListenerAdapter {
         .filter(!_.restricted)
         .map(_.commandData): _*
     ).queue()
-
 
     val homeIdOpt = botConfig.get("home")
     homeIdOpt match {
